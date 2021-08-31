@@ -1,0 +1,8 @@
+New Java project with whatever name, create a package called 'test' and create Main.java class
+Right click the project name and go to Build Path> Configure Build Path
+Should open in Libraries tab
+Click on Classpath then Add External JARs on the side buttons
+Navigate to the location of the mysql-connector-java-8.0.26.jar and open
+(should look like screenshot)
+Apply and Close
+Run project, should print to console!
