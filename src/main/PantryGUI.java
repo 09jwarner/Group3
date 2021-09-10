@@ -1,6 +1,6 @@
 package main;
 /** File: 		PantryGUI.java
- ** Author: 	Group 3 Heahter, John and MC
+ ** Author: 	Group 3 Heather, John and MC
  ** Date: 		10/10/2021
  ** Purpose: 	This class contains the main method and its constructor contains
  **				all the buttons to create the GUI for the user to manage their 
@@ -41,6 +41,7 @@ public class PantryGUI extends JFrame {
 	private JButton exitBtn = new JButton("Exit Program");
 	private String sql;
 	private String reportName;
+	Border border;
 	
 	/**
 	 * GUIShape constructor
@@ -77,12 +78,12 @@ public class PantryGUI extends JFrame {
 		expireBtn = new JButton("");
 		lowInvAlert.setEditable(false);
 		lowInvBtn.setSize(10,10);
-		Border border = BorderFactory.createLineBorder(Color.RED);
+		
 
 		sql = "SELECT count(*) from Breads WHERE BakeTemp > " + LOW_INV;
 		if (CheckLowInventory.checkInv(con, sql)) {
 			lowInvAlert.setFont(new Font("Dialog", Font.BOLD, 16));
-			lowInvAlert.setText("Low Inventory");
+			lowInvAlert.setText("Low Inventory Alert");
 			lowInvAlert.setBackground(Color.RED);
 			lowInvBtn = new JButton("Click to See Low Inventory");
 			
@@ -194,7 +195,7 @@ public class PantryGUI extends JFrame {
 	}
 	
 	private Connection openDatabase() {
-        String host = "jdbc:mysql://mysqltrial.c0gfjylwc1ro.us-east-2.rds.amazonaws.com:3306/mydb";
+        String host = "endpoint";
         String uname = "admin";
         String password = "pineapple";
         Connection con = null;
