@@ -2,26 +2,20 @@ package main;
 
 import java.awt.BorderLayout;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
 import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 public class InventoryReport {
-	JMenuBar menuBar;
-	JMenu file;
-	JMenuItem openMenu;
-	JTextArea textArea;
-	static String[] columnNames = { "Bread", "Dough", "Cuisine", "Prooftime", "Temp" };
+
+	static String[] columnNames = { "item_name", "item_date", "amount", "min_amount", "max_amount" };
 	
 
 	public static void displayInvReport(Connection con, String sql, String reportName) {
@@ -31,13 +25,13 @@ public class InventoryReport {
 			ResultSet rs = stmt.executeQuery(sql);
 
 			while (rs.next()) {
-				String name = rs.getString("Name");
-				String dough = rs.getString("DOUGHTYPE");
-				String cuisine = rs.getString("Cuisine");
-				int proof = rs.getInt("ProofTime");
-				int temp = rs.getInt("BakeTemp");
+				String name = rs.getString("item_name");
+				Date date = Date.valueOf(rs.getString("item_date"));
+				int qty = rs.getInt("amount");
+				int minQty = rs.getInt("min_amount");
+				int maxQty = rs.getInt("max_amount");
 				
-				dtm.addRow(new Object[] { name, dough, cuisine, proof, temp });
+				dtm.addRow(new Object[] { name, date, qty, minQty, maxQty });
 
 			}
 

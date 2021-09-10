@@ -3,8 +3,7 @@ package main;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -17,16 +16,16 @@ import javax.swing.JTextField;
 public class AddItem {
 
 	public static void addInvItem(Connection con) {
-		JTextField dim1Txt = new JTextField(10);
-		JLabel dim1Lbl= new JLabel();
-		JTextField dim2Txt = new JTextField(10);
-		JLabel dim2Lbl= new JLabel();
-		JTextField dim3Txt = new JTextField(10);
-		JLabel dim3Lbl= new JLabel();
-		JTextField dim4Txt = new JTextField(10);
-		JLabel dim4Lbl= new JLabel();
-		JTextField dim5Txt = new JTextField(10);
-		JLabel dim5Lbl= new JLabel();
+		JTextField add1Txt = new JTextField(10);
+		JLabel add1Lbl= new JLabel();
+		JTextField add2Txt = new JTextField(10);
+		JLabel add2Lbl= new JLabel();
+		JTextField add3Txt = new JTextField(10);
+		JLabel add3Lbl= new JLabel();
+		JTextField add4Txt = new JTextField(10);
+		JLabel add4Lbl= new JLabel();
+		JTextField add5Txt = new JTextField(10);
+		JLabel add5Lbl= new JLabel();
 		JPanel addPanel = new JPanel();
 		addPanel.setLayout(new GridLayout(5, 1, 50, 20));
 		addPanel.setPreferredSize(new Dimension(500, 250));
@@ -36,37 +35,36 @@ public class AddItem {
 		
 		String input1;
 		String input2;
-		String input3;
+		int input3;
 		int input4;
-		int input5;
+		int input5;  
 		
-		dim1Lbl = new JLabel("Enter Bread Name: ");
-		addPanel.add(dim1Lbl);
-		addPanel.add(dim1Txt);
-		dim2Lbl = new JLabel("Enter Doughtype: ");
-		addPanel.add(dim2Lbl);
-		addPanel.add(dim2Txt);
-		dim3Lbl = new JLabel("Enter Cuisine: ");
-		addPanel.add(dim3Lbl);
-		addPanel.add(dim3Txt);
-		dim4Lbl = new JLabel("Enter Prooftime: ");
-		addPanel.add(dim4Lbl);
-		addPanel.add(dim4Txt);
-		dim5Lbl = new JLabel("Enter Baketemp: ");
-		addPanel.add(dim5Lbl);
-		addPanel.add(dim5Txt);
+		add1Lbl = new JLabel("Enter Item Name: ");
+		addPanel.add(add1Lbl);
+		addPanel.add(add1Txt);
+		add2Lbl = new JLabel("Enter Date: ");
+		addPanel.add(add2Lbl);
+		addPanel.add(add2Txt);
+		add3Lbl = new JLabel("Enter Amount: ");
+		addPanel.add(add3Lbl);
+		addPanel.add(add3Txt);
+		add4Lbl = new JLabel("Enter Min Amount: ");
+		addPanel.add(add4Lbl);
+		addPanel.add(add4Txt);
+		add5Lbl = new JLabel("Enter Max Amount: ");
+		addPanel.add(add5Lbl);
+		addPanel.add(add5Txt);
 		addPanel.setBorder(BorderFactory.createTitledBorder("Add Inventory:"));
 
 		String name = "Add Item";
 		n = enterInput(name, addPanel, options);
-		System.out.println(dim1Txt.getText());
 		if (n == 0) {
 			try {
-				input1 = dim1Txt.getText();
-				input2 = dim2Txt.getText();
-				input3 = dim3Txt.getText();
-				input4 = Integer.parseInt(dim4Txt.getText());
-				input5 = Integer.parseInt(dim5Txt.getText());
+				input1 = add1Txt.getText();
+				input2 = add2Txt.getText();
+				input3 = Integer.parseInt(add3Txt.getText());
+				input4 = Integer.parseInt(add4Txt.getText());
+				input5 = Integer.parseInt(add5Txt.getText());
 				addToDatabase(con, input1, input2, input3, input4, input5);
 			} catch (Exception e) {
 				System.out.println(e);
@@ -90,14 +88,19 @@ public class AddItem {
 		return n;
 	}
 
-	private static void addToDatabase(Connection con, String breadName, String dough, String cuisine, 
-			int proof, int temp) throws SQLException {
+	private static void addToDatabase(Connection con, String userName, String date, int qty, 
+			int minQty, int maxQty) throws SQLException {
         Statement stmt = con.createStatement();
-        String sql = "INSERT INTO Breads (Name, Doughtype, Cuisine, Prooftime, Baketemp) "
-          		+ "VALUES ('" +breadName + "','" + dough + "','"+ cuisine + "','"+ proof + "','"+ temp +"')";
+        //String sql = "INSERT INTO Breads (Name, Doughtype, Cuisine, Prooftime, Baketemp) "
+        // 		+ "VALUES ('" +breadName + "','" + dough + "','"+ cuisine + "','"+ proof + "','"+ temp +"')";
+        //mcbfood
+        Date itemDate=Date.valueOf(date);
+        System.out.println(itemDate);
+        String sql = "INSERT INTO mcbfood (item_name, item_date, amount, min_amount, max_amount) "
+         		+ "VALUES ('" +userName + "','" + itemDate + "',"+ qty + ","+ minQty + ","+ maxQty +")";
         System.out.println(sql);
         int rs = stmt.executeUpdate(sql);
-        System.out.println(rs);
+        System.out.println("RS " + rs);
         if (rs==1) {
         	JOptionPane jf = new JOptionPane();
 			JOptionPane.showMessageDialog(jf, "Successfully added");

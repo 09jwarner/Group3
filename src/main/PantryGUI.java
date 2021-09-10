@@ -12,9 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -32,9 +30,9 @@ public class PantryGUI extends JFrame {
 	private JButton showBtn = new JButton("Show Current Inventory");
 	
 	//Alert Buttons
-	private JButton expireBtn = new JButton("Show Expired Items");
-	private JTextField expireAlert = new JTextField(20);
-	private JButton lowInvBtn = new JButton("Show Low Inventory");
+	private JButton expiredBtn = new JButton("");
+	private JTextField expiredAlert = new JTextField(20);
+	private JButton lowInvBtn = new JButton("");
 	private JTextField lowInvAlert = new JTextField(20);
 
 	// Create exit text buttons
@@ -48,7 +46,7 @@ public class PantryGUI extends JFrame {
 	 * @throws SQLException 
 	 */
 	public PantryGUI() throws SQLException {
-		Connection con = openDatabase();
+		Connection con = getCredentials();
 		setTitle("Group 3 Pantry");
 		setSize(W, H);
 		setLocationRelativeTo(null);
@@ -72,39 +70,22 @@ public class PantryGUI extends JFrame {
 
 		// Create panel for alert
 		JPanel alertPanel = new JPanel();
-		alertPanel.setLayout(new GridLayout(3, 2, 40, 20));
+		alertPanel.setLayout(new GridLayout(2, 2, 40, 20));
 		alertPanel.setPreferredSize(new Dimension(150, 75));
 		alertPanel.setBorder(BorderFactory.createTitledBorder("Alerts:"));
-		expireBtn = new JButton("");
+		
+		//Low Inventory Check
 		lowInvAlert.setEditable(false);
-		lowInvBtn.setSize(10,10);
+		lowInvBtn.setSize(10,20);		
+		checkLowInvAlert(con, alertPanel);
+		alertPanel.add(lowInvAlert);
+		alertPanel.add(lowInvBtn);
 		
+		//Expired Check
+		checkExpired(con, alertPanel);		
+		alertPanel.add(expiredAlert);
+		alertPanel.add(expiredBtn);
 
-		sql = "SELECT count(*) from Breads WHERE BakeTemp > " + LOW_INV;
-		if (CheckLowInventory.checkInv(con, sql)) {
-			lowInvAlert.setFont(new Font("Dialog", Font.BOLD, 16));
-			lowInvAlert.setText("Low Inventory Alert");
-			lowInvAlert.setBackground(Color.RED);
-			lowInvBtn = new JButton("Click to See Low Inventory");
-			
-			alertPanel.add(lowInvAlert);
-			alertPanel.add(lowInvBtn);
-		} else {
-			border = BorderFactory.createLineBorder(Color.LIGHT_GRAY);
-			lowInvAlert.setBorder(border);
-			lowInvAlert.setText("Inventory all Good!");
-			lowInvAlert.setSize(10,15);
-			alertPanel.add(lowInvAlert);
-		}
-		expireAlert.setEditable(false);
-		
-		expireAlert.setText("No Expired Goods");
-		expireAlert.setSize(20, 10);
-		expireBtn.setVisible(false);
-		alertPanel.add(expireAlert);
-		alertPanel.add(expireBtn);
-		
-		
 		// Create panel for exit button
 		JPanel exitPanel = new JPanel();
 		exitPanel.setPreferredSize(new Dimension(75, 10));
@@ -122,17 +103,24 @@ public class PantryGUI extends JFrame {
 		addBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				JOptionPane jPane = new JOptionPane();
 				AddItem.addInvItem(con);
-				JOptionPane.showMessageDialog(jPane, "Item successfully added!");
+				try {
+					refreshAlerts(con, alertPanel, mainPanel);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 		
 		deleteBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				JOptionPane jPane = new JOptionPane();
-				JOptionPane.showMessageDialog(jPane, "Delete an Item!");
+				DeleteItem.deleteInvItem(con);
+				try {
+					refreshAlerts(con, alertPanel, mainPanel);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 		
@@ -147,26 +135,25 @@ public class PantryGUI extends JFrame {
 		showBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				JOptionPane jPane = new JOptionPane();
-				JOptionPane.showMessageDialog(jPane, "Show Total Inventory!");
-				sql = "SELECT * from Breads";
+				sql = "SELECT * from mcbfood";
 				reportName = "Inventory Report";
 				InventoryReport.displayInvReport(con, sql, reportName);
 				}
 		});
 		
-		expireBtn.addActionListener(new ActionListener() {
+		expiredBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				JOptionPane jPane = new JOptionPane();
-				JOptionPane.showMessageDialog(jPane, "Show Expired Inventory!");
+				sql = "SELECT * from mcbfood WHERE item_date <= '2021-10-01'";
+				reportName = "Expired Inventory";
+				InventoryReport.displayInvReport(con, sql, reportName);
 			}
 		});
 		
 		lowInvBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				sql = "SELECT * from Breads WHERE BakeTemp > " + LOW_INV;
+				sql = "SELECT * from mcbfood WHERE amount <= min_amount";
 				reportName = "Low Inventory";
 				InventoryReport.displayInvReport(con, sql, reportName);
 			}
@@ -182,6 +169,42 @@ public class PantryGUI extends JFrame {
 	}
 
 
+	private void checkExpired(Connection con, JPanel alertPanel) throws SQLException {
+		sql = "SELECT count(*) from mcbfood WHERE item_date <= '2021-09-14'";
+		if (CheckForAlerts.checkExpiredItems(con, sql)) {
+			expiredAlert.setFont(new Font("Dialog", Font.BOLD, 16));
+			expiredAlert.setText("Expired Items Alert");
+			expiredAlert.setBackground(Color.RED);
+			expiredBtn.setText("Click to See soon to be Expired and Expired Items");			
+		} else {
+			expiredAlert.setBackground(null);
+			expiredAlert.setText("No Expired Items!");
+			expiredAlert.setSize(10,15);
+			expiredBtn.setText("");
+		}
+	}
+
+
+	private void checkLowInvAlert(Connection con, JPanel alertPanel) throws SQLException {
+		sql = "SELECT count(*) from mcbfood WHERE amount <= min_amount";
+		if (CheckForAlerts.checkLowInv(con, sql)) {
+			lowInvAlert.setFont(new Font("Dialog", Font.BOLD, 16));
+			lowInvAlert.setText("Low Inventory Alert");
+			lowInvAlert.setBackground(Color.RED);
+			lowInvBtn.setText("Click to See Low Inventory");
+		} else {
+			lowInvAlert.setBackground(null);
+			lowInvAlert.setText("Inventory all Good!");
+			lowInvBtn.setText("");
+		}
+	}
+
+
+	private void refreshAlerts(Connection con, JPanel alertPanel, JPanel mainPanel) throws SQLException {
+		alertPanel.setBorder(BorderFactory.createTitledBorder("Updated Alerts:"));
+		checkLowInvAlert(con, alertPanel);
+		checkExpired(con, alertPanel);
+	}
 	/**
 	 * exitBtnAction: 	Allows the user to have an exit button to 
 	 * 					quickly exit the program and give an exit message.
@@ -194,10 +217,34 @@ public class PantryGUI extends JFrame {
 		System.exit(EXIT_ON_CLOSE);
 	}
 	
-	private Connection openDatabase() {
-        String host = "endpoint";
-        String uname = "admin";
-        String password = "pineapple";
+	private Connection getCredentials() {
+		JTextField userTxt = new JTextField(20);
+		JLabel userLbl= new JLabel();
+		JTextField pswdTxt = new JTextField(20);
+		JLabel pswdLbl= new JLabel();
+		JPanel panel = new JPanel();
+		String[] options = {"OK"};
+		Connection con = null;
+		userLbl = new JLabel("Enter User Name: ");
+		panel.add(userLbl);
+		panel.add(userTxt);
+		pswdLbl = new JLabel("Enter Password: ");
+		panel.add(pswdLbl);
+		panel.add(pswdTxt);
+		int n = JOptionPane.showOptionDialog(null, panel, "Enter Credentials", JOptionPane.NO_OPTION, 
+				JOptionPane.QUESTION_MESSAGE, null, options , options[0]);
+		if (n == 0) {
+			String user = userTxt.getText();
+			String pswd = pswdTxt.getText();
+			con = openDatabase(user, pswd); 
+		}
+		return con;
+	}
+	
+	private Connection openDatabase(String user, String pswd) {
+        String host = "jdbc:mysql://mysqltrial.c0gfjylwc1ro.us-east-2.rds.amazonaws.com:3306/mydb";
+        String uname = user;
+        String password = pswd;
         Connection con = null;
         try {
          	Class.forName("com.mysql.cj.jdbc.Driver"); 
