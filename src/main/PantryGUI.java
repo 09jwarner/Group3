@@ -11,15 +11,17 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 
 public class PantryGUI extends JFrame {
 	
-	private static final int LOW_INV = 400;
+	private static final int DAYS_TO_ADD_EXPIRED = 5;
 
 	static final int W = 600, H = 500;
 	
@@ -37,16 +39,20 @@ public class PantryGUI extends JFrame {
 
 	// Create exit text buttons
 	private JButton exitBtn = new JButton("Exit Program");
+
 	private String sql;
 	private String reportName;
-	Border border;
-	
+	private LocalDate date = LocalDate.now(); 
+	private Date datePlusDays = Date.valueOf(date.plusDays(DAYS_TO_ADD_EXPIRED));
+
+
 	/**
 	 * GUIShape constructor
 	 * @throws SQLException 
 	 */
 	public PantryGUI() throws SQLException {
 		Connection con = getCredentials();
+
 		setTitle("Group 3 Pantry");
 		setSize(W, H);
 		setLocationRelativeTo(null);
@@ -127,8 +133,12 @@ public class PantryGUI extends JFrame {
 		updateBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				JOptionPane jPane = new JOptionPane();
-				JOptionPane.showMessageDialog(jPane, "Update an Item!");
+				UpdateItem.updateInvItem(con);
+				try {
+					refreshAlerts(con, alertPanel, mainPanel);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 
@@ -144,7 +154,7 @@ public class PantryGUI extends JFrame {
 		expiredBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				sql = "SELECT * from mcbfood WHERE item_date <= '2021-10-01'";
+				sql = "SELECT * from mcbfood WHERE item_date <= '" + datePlusDays + "'";
 				reportName = "Expired Inventory";
 				InventoryReport.displayInvReport(con, sql, reportName);
 			}
@@ -170,7 +180,7 @@ public class PantryGUI extends JFrame {
 
 
 	private void checkExpired(Connection con, JPanel alertPanel) throws SQLException {
-		sql = "SELECT count(*) from mcbfood WHERE item_date <= '2021-09-14'";
+		sql = "SELECT count(*) from mcbfood WHERE item_date <= '" + datePlusDays + "'";
 		if (CheckForAlerts.checkExpiredItems(con, sql)) {
 			expiredAlert.setFont(new Font("Dialog", Font.BOLD, 16));
 			expiredAlert.setText("Expired Items Alert");
@@ -198,7 +208,6 @@ public class PantryGUI extends JFrame {
 			lowInvBtn.setText("");
 		}
 	}
-
 
 	private void refreshAlerts(Connection con, JPanel alertPanel, JPanel mainPanel) throws SQLException {
 		alertPanel.setBorder(BorderFactory.createTitledBorder("Updated Alerts:"));

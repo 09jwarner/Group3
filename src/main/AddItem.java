@@ -42,7 +42,7 @@ public class AddItem {
 		add1Lbl = new JLabel("Enter Item Name: ");
 		addPanel.add(add1Lbl);
 		addPanel.add(add1Txt);
-		add2Lbl = new JLabel("Enter Date: ");
+		add2Lbl = new JLabel("Enter Date(YYYY-MM-DD): ");
 		addPanel.add(add2Lbl);
 		addPanel.add(add2Txt);
 		add3Lbl = new JLabel("Enter Amount: ");
@@ -91,16 +91,11 @@ public class AddItem {
 	private static void addToDatabase(Connection con, String userName, String date, int qty, 
 			int minQty, int maxQty) throws SQLException {
         Statement stmt = con.createStatement();
-        //String sql = "INSERT INTO Breads (Name, Doughtype, Cuisine, Prooftime, Baketemp) "
-        // 		+ "VALUES ('" +breadName + "','" + dough + "','"+ cuisine + "','"+ proof + "','"+ temp +"')";
         //mcbfood
         Date itemDate=Date.valueOf(date);
-        System.out.println(itemDate);
         String sql = "INSERT INTO mcbfood (item_name, item_date, amount, min_amount, max_amount) "
          		+ "VALUES ('" +userName + "','" + itemDate + "',"+ qty + ","+ minQty + ","+ maxQty +")";
-        System.out.println(sql);
         int rs = stmt.executeUpdate(sql);
-        System.out.println("RS " + rs);
         if (rs==1) {
         	JOptionPane jf = new JOptionPane();
 			JOptionPane.showMessageDialog(jf, "Successfully added");
