@@ -5,6 +5,11 @@ package main;
  ** Purpose: 	This class contains the main method and its constructor contains
  **				all the buttons to create the GUI for the user to manage their 
  **				inventory.
+ ** Revisions:
+ *	1.1		09/24/2021 		Heather		Updated connection information and updated table name and column names 	 
+ *
+ *
+ *
  **/
 
 import java.awt.*;
@@ -145,7 +150,7 @@ public class PantryGUI extends JFrame {
 		showBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				sql = "SELECT * from mcbfood";
+				sql = "SELECT * from Inventory";
 				reportName = "Inventory Report";
 				InventoryReport.displayInvReport(con, sql, reportName);
 				}
@@ -154,7 +159,7 @@ public class PantryGUI extends JFrame {
 		expiredBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				sql = "SELECT * from mcbfood WHERE item_date <= '" + datePlusDays + "'";
+				sql = "SELECT * from Inventory WHERE exp_date <= '" + datePlusDays + "'";
 				reportName = "Expired Inventory";
 				InventoryReport.displayInvReport(con, sql, reportName);
 			}
@@ -163,7 +168,7 @@ public class PantryGUI extends JFrame {
 		lowInvBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				sql = "SELECT * from mcbfood WHERE amount <= min_amount";
+				sql = "SELECT * from Inventory WHERE amount <= min_qty";
 				reportName = "Low Inventory";
 				InventoryReport.displayInvReport(con, sql, reportName);
 			}
@@ -180,7 +185,7 @@ public class PantryGUI extends JFrame {
 
 
 	private void checkExpired(Connection con, JPanel alertPanel) throws SQLException {
-		sql = "SELECT count(*) from mcbfood WHERE item_date <= '" + datePlusDays + "'";
+		sql = "SELECT count(*) from Inventory WHERE exp_date <= '" + datePlusDays + "'";
 		if (CheckForAlerts.checkExpiredItems(con, sql)) {
 			expiredAlert.setFont(new Font("Dialog", Font.BOLD, 16));
 			expiredAlert.setText("Expired Items Alert");
@@ -196,7 +201,7 @@ public class PantryGUI extends JFrame {
 
 
 	private void checkLowInvAlert(Connection con, JPanel alertPanel) throws SQLException {
-		sql = "SELECT count(*) from mcbfood WHERE amount <= min_amount";
+		sql = "SELECT count(*) from Inventory WHERE qty_in_stock <= min_qty";
 		if (CheckForAlerts.checkLowInv(con, sql)) {
 			lowInvAlert.setFont(new Font("Dialog", Font.BOLD, 16));
 			lowInvAlert.setText("Low Inventory Alert");
@@ -251,7 +256,7 @@ public class PantryGUI extends JFrame {
 	}
 	
 	private Connection openDatabase(String user, String pswd) {
-        String host = "jdbc:mysql://mysqltrial.c0gfjylwc1ro.us-east-2.rds.amazonaws.com:3306/mydb";
+        String host = "jdbc:mysql://foodtruckapp.c0gfjylwc1ro.us-east-2.rds.amazonaws.com:3306/TruckDatabase";
         String uname = user;
         String password = pswd;
         Connection con = null;
