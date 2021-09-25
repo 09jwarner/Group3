@@ -1,5 +1,19 @@
 package main;
 
+/** File: 		InventoryReport.java
+ ** Author: 	Group 3 Heather, John and MC
+ ** Date: 		10/10/2021
+ ** Purpose: 	This class contains methods to retrieve all rows from the Inventory table
+ **				
+ **				
+ ** Revisions:
+ *	1.0 	09/23/2021		??????		File created 
+ *	1.1		09/25/2021 		Heather		Updated table column names to match table
+ *	
+ *
+ *
+ **/
+
 import java.awt.BorderLayout;
 import java.sql.Connection;
 import java.sql.Date;
@@ -15,7 +29,7 @@ import javax.swing.table.DefaultTableModel;
 
 public class InventoryReport {
 
-	static String[] columnNames = { "item_name", "item_date", "amount", "min_amount", "max_amount" };
+	static String[] columnNames = { "item_name", "exp_date", "qty_in_stock", "min_qty", "max_qty" };
 	
 
 	public static void displayInvReport(Connection con, String sql, String reportName) {
@@ -26,10 +40,10 @@ public class InventoryReport {
 
 			while (rs.next()) {
 				String name = rs.getString("item_name");
-				Date date = Date.valueOf(rs.getString("item_date"));
-				int qty = rs.getInt("amount");
-				int minQty = rs.getInt("min_amount");
-				int maxQty = rs.getInt("max_amount");
+				Date date = Date.valueOf(rs.getString("exp_date"));
+				int qty = rs.getInt("qty_in_stock");
+				int minQty = rs.getInt("min_qty");
+				int maxQty = rs.getInt("max_qty");
 				
 				dtm.addRow(new Object[] { name, date, qty, minQty, maxQty });
 

@@ -168,7 +168,7 @@ public class PantryGUI extends JFrame {
 		lowInvBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				sql = "SELECT * from Inventory WHERE amount <= min_qty";
+				sql = "SELECT * from Inventory WHERE qty_in_stock <= min_qty";
 				reportName = "Low Inventory";
 				InventoryReport.displayInvReport(con, sql, reportName);
 			}
