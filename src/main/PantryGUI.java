@@ -22,10 +22,15 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 
 import javax.swing.*;
-import javax.swing.border.Border;
+//import javax.swing.border.Border;
 
 public class PantryGUI extends JFrame {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private static final int DAYS_TO_ADD_EXPIRED = 5;
 
 	static final int W = 600, H = 500;
@@ -234,7 +239,9 @@ public class PantryGUI extends JFrame {
 	private Connection getCredentials() {
 		JTextField userTxt = new JTextField(20);
 		JLabel userLbl= new JLabel();
-		JTextField pswdTxt = new JTextField(20);
+		//JTextField pswdTxt = new JTextField(20);
+		// Changed to JPasswordField to mask password text.
+		JPasswordField pswdTxt = new JPasswordField(20);
 		JLabel pswdLbl= new JLabel();
 		JPanel panel = new JPanel();
 		String[] options = {"OK"};
@@ -249,8 +256,12 @@ public class PantryGUI extends JFrame {
 				JOptionPane.QUESTION_MESSAGE, null, options , options[0]);
 		if (n == 0) {
 			String user = userTxt.getText();
-			String pswd = pswdTxt.getText();
-			con = openDatabase(user, pswd); 
+			// getText() has been deprecated, used character array
+			// used the variable String password to pass to openDatabase J. Warner 
+			char[] pswd = pswdTxt.getPassword();
+			String password = new String(pswd);
+			//con = openDatabase(user, pswd); 
+			con = openDatabase(user, password);
 		}
 		return con;
 	}
@@ -286,6 +297,5 @@ public class PantryGUI extends JFrame {
 	public static void main(String[] args) throws SQLException {
 		PantryGUI gui = new PantryGUI();
 		gui.setVisible(true);
-		
 	}
 }
