@@ -1,4 +1,5 @@
 package main;
+
 /** File: 		PantryGUI.java
  ** Author: 	Group 3 Heather, John and MC
  ** Date: 		10/10/2021
@@ -34,7 +35,7 @@ public class PantryGUI extends JFrame {
 
 	static final int W = 600, H = 500;
 
-	// Create radio buttons
+	// Create buttons
 	private JButton addBtn = new JButton("Add Item");
 	private JButton deleteBtn = new JButton("Remove Item");
 	private JButton updateBtn = new JButton("Update Item");
@@ -55,9 +56,7 @@ public class PantryGUI extends JFrame {
 	private Date datePlusDays = Date.valueOf(date.plusDays(DAYS_TO_ADD_EXPIRED));
 
 	/**
-	 * GUIShape constructor
-	 * 
-	 * @throws SQLException
+	 * PantryGUI constructor
 	 */
 	public PantryGUI() {
 		Connection con = getCredentials();
@@ -179,6 +178,32 @@ public class PantryGUI extends JFrame {
 			lowInvBtn.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent event) {
+					sql = "SELECT * from Inventory WHERE qty_in_stock <= min_qty";
+					reportName = "Low Inventory";
+					InventoryReport.displayInvReport(con, sql, reportName);
+				}
+			});
+
+			// Listener method for exit button
+			exitBtn.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent event) {
+					exitBtnAction(event, con);
+				}
+			});
+
+			expiredBtn.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent event) {
+					sql = "SELECT * from Inventory WHERE exp_date <= '" + datePlusDays + "'";
+					reportName = "Expired Inventory";
+					InventoryReport.displayInvReport(con, sql, reportName);
+				}
+			});
+
+			lowInvBtn.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent event) {
 					sql = "SELECT * from Inventory WHERE amount <= min_qty";
 					reportName = "Low Inventory";
 					InventoryReport.displayInvReport(con, sql, reportName);
@@ -196,10 +221,10 @@ public class PantryGUI extends JFrame {
 	}
 
 	/**
-	 * checkExpired: 	Checks to see if there is inventory that has expired or will expire
-	 * 					in the next 5 days.
-	 * @param con:			connection
-	 * @param alertPanel:	alert main panel
+	 * checkExpired: Checks to see if there is inventory that has expired or will
+	 * expire in the next 5 days.
+	 * @param con:        connection
+	 * @param alertPanel: alert main panel
 	 */
 	private void checkExpired(Connection con, JPanel alertPanel) {
 		sql = "SELECT count(*) from Inventory WHERE exp_date <= '" + datePlusDays + "'";
@@ -223,10 +248,10 @@ public class PantryGUI extends JFrame {
 	}
 
 	/**
-	 * checkLowInvAlert:	Checks to see if there is inventory with qty_in_stock that is less than or equal
-	 * 						to min_qty needed to be kept on hand.
-	 * @param con:			connection
-	 * @param alertPanel:	alert main panel
+	 * checkLowInvAlert: Checks to see if there is inventory with qty_in_stock that
+	 * is less than or equal to min_qty needed to be kept on hand.
+	 * @param con:        connection
+	 * @param alertPanel: alert main panel
 	 */
 	private void checkLowInvAlert(Connection con, JPanel alertPanel) {
 		sql = "SELECT count(*) from Inventory WHERE qty_in_stock <= min_qty";
@@ -250,11 +275,11 @@ public class PantryGUI extends JFrame {
 	}
 
 	/**
-	 * refreshAlerts:	When inventory has been added, deleted or updated it refreshes the expired or low 
-	 * 					inventory alert messages.
-	 * @param con:		connection
-	 * @param lowInvAlertPanel:		low inventory alert panel
-	 * @param expiredAlertPanel:	expired alert panel 
+	 * refreshAlerts: When inventory has been added, deleted or updated it refreshes
+	 * the expired or low inventory alert messages.
+	 * @param con:               connection
+	 * @param lowInvAlertPanel:  low inventory alert panel
+	 * @param expiredAlertPanel: expired alert panel
 	 */
 	private void refreshAlerts(Connection con, JPanel lowInvAlertPanel, JPanel expiredAlertPanel) {
 		lowInvAlertPanel.setBorder(BorderFactory.createTitledBorder("Updated Low Inventory Alerts:"));
@@ -266,7 +291,7 @@ public class PantryGUI extends JFrame {
 	/**
 	 * exitBtnAction: Allows the user to have an exit button to quickly exit the
 	 * program and give an exit message.
-	 * @param e
+	 * @param con: connection
 	 */
 	public void exitBtnAction(ActionEvent e, Connection con) {
 		JOptionPane jPane = new JOptionPane();
@@ -276,8 +301,8 @@ public class PantryGUI extends JFrame {
 	}
 
 	/**
-	 * getCredentials: 	It gets the username and password.  It masks the password.
-	 * @return con:		Connection
+	 * getCredentials: It gets the username and password. It masks the password.
+	 * @return con: Connection
 	 */
 	private Connection getCredentials() {
 		int count = 0;
@@ -322,11 +347,12 @@ public class PantryGUI extends JFrame {
 	}
 
 	/**
-	 * openDatabase: 	Takes the username and password and tries to open the Truck database. The user
-	 * 					is given 5 attempts to input correct username/password combo before program closes.
-	 * @param user:		user name		
-	 * @param pswd:		masked password
-	 * @return con:		connection
+	 * openDatabase: Takes the username and password and tries to open the Truck
+	 * database. The user is given 5 attempts to input correct username/password
+	 * combo before program closes.
+	 * @param user: user name
+	 * @param pswd: masked password
+	 * @return con: connection
 	 */
 	private Connection openDatabase(String user, String pswd, int count) {
 		String host = "jdbc:mysql://foodtruckapp.c0gfjylwc1ro.us-east-2.rds.amazonaws.com:3306/TruckDatabase";
@@ -340,7 +366,8 @@ public class PantryGUI extends JFrame {
 			JOptionPane jf = new JOptionPane();
 			JOptionPane.showMessageDialog(jf, "Your user name or password is incorrect. Please try again.");
 			if (count == 4) {
-				JOptionPane.showMessageDialog(jf,"You have had 4 unsuccessful logins. You have one more attempt to login.");
+				JOptionPane.showMessageDialog(jf,
+						"You have had 4 unsuccessful logins. You have one more attempt to login.");
 			}
 			if (count == 5) {
 				System.exit(EXIT_ON_CLOSE);
@@ -350,8 +377,8 @@ public class PantryGUI extends JFrame {
 	}
 
 	/**
-	 * closeDatabase:	Closes the database
-	 * @param con:		connection
+	 * closeDatabase: Closes the database
+	 * @param con: connection
 	 */
 	private void closeDatabase(Connection con) {
 		try {
