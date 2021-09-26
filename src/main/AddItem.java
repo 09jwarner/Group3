@@ -82,13 +82,51 @@ public class AddItem {
 
 			if (n == 0) {
 				try {
+					
 					//TODO Input validation
 					inputItem = add1Txt.getText();
+					if (inputItem.length() > 30) {
+						JOptionPane jf = new JOptionPane();
+						JOptionPane.showMessageDialog(jf, "The item name cannot be greater than 30 characters.");
+						break;
+					}
 					inputDate = add2Txt.getText();
 					itemDate = Date.valueOf(inputDate);
 					inputQty = Integer.parseInt(add3Txt.getText());
 					inputMin = Integer.parseInt(add4Txt.getText());
 					inputMax = Integer.parseInt(add5Txt.getText());
+					/*
+					 * Test inputQty is less than 30 items, greater than minimum quantity 
+					 * and less than maximum quantity
+					 */
+					if (inputQty < inputMin) {
+						JOptionPane jf = new JOptionPane();
+						JOptionPane.showMessageDialog(jf, "The Quantity cannot be less than the Minimum Quantity.");
+						break;
+					}
+					else if (inputQty > inputMax) {
+						JOptionPane jf = new JOptionPane();
+						JOptionPane.showMessageDialog(jf, "The Quantity cannot be greater than the Maximum Quantity.");
+						break;
+					}
+					else if (inputQty > 30) {
+						JOptionPane jf = new JOptionPane();
+						JOptionPane.showMessageDialog(jf, "The Quantity cannot be greater than 30 items.");
+						break;
+					}
+					/*
+					 * Test inputMin less than inputMax
+					 */
+					if (inputMin >= inputMax) {
+						JOptionPane jf = new JOptionPane();
+						JOptionPane.showMessageDialog(jf, "The Minimum Quantity cannot be equal to or greater than Maximum Quantity.");
+						break;
+					}
+					if (inputMax > 30) {
+						JOptionPane jf = new JOptionPane();
+						JOptionPane.showMessageDialog(jf, "The Maximum Quantity cannot be greater than 30 items.");
+						break;
+					}
 					addToDatabase(con, inputItem, itemDate, inputQty, inputMin, inputMax);
 					break;
 				// Catch for date and number format errors
