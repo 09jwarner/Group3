@@ -94,7 +94,7 @@ public class DeleteItem {
 		delPanel.add(del5Lbl);
 		delPanel.add(del5Txt);
 		
-		String sql = "SELECT * from mcbfood WHERE item_name = " + "'" + name + "';";
+		String sql = "SELECT * from Inventory WHERE item_name = " + "'" + name + "';";
 		Statement stmt = con.createStatement();
 		ResultSet rs = stmt.executeQuery(sql);
         while (rs.next()) {
@@ -114,7 +114,7 @@ public class DeleteItem {
 
 	private static void deleteFromDatabase(Connection con, String itemName) throws SQLException {
         Statement stmt = con.createStatement();
-        String sql = "DELETE from mcbfood WHERE item_name = " + "'" + itemName + "'";
+        String sql = "DELETE from Inventory WHERE item_name = " + "'" + itemName + "'";
         int rs = stmt.executeUpdate(sql);
         if (rs==1) {
         	JOptionPane jf = new JOptionPane();

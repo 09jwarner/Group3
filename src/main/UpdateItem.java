@@ -96,7 +96,7 @@ public class UpdateItem {
 		updatePanel.add(update5Lbl);
 		updatePanel.add(update5Txt);
 		
-		String sql = "SELECT * from mcbfood WHERE item_name = " + "'" + name + "';";
+		String sql = "SELECT * from Inventory WHERE item_name = " + "'" + name + "';";
 		Statement stmt = con.createStatement();
 		ResultSet rs = stmt.executeQuery(sql);
 		String itemName;
@@ -132,7 +132,7 @@ public class UpdateItem {
 	private static void updateItemDatabase(Connection con, String itemName, Date itemDate, int qty, int minQty, int maxQty)
 			throws SQLException {
         Statement stmt = con.createStatement();
-        String sql = "UPDATE mcbfood SET item_date = " + "'" + itemDate + "'" 
+        String sql = "UPDATE Inventory SET item_date = " + "'" + itemDate + "'" 
         		+ ", amount = " + qty  + ", min_amount = " + minQty 
         		+ ", max_amount = " + maxQty + " WHERE item_name = " + "'" + itemName + "'";
         int rs = stmt.executeUpdate(sql);
