@@ -1,11 +1,27 @@
 package main;
 
+/** File: 		UpdateItem.java
+ ** Author: 	Group 3 Heather, John and MC
+ ** Date: 		10/10/2021
+ ** Purpose: 	This class allows the user to enter an item for updating in the table.
+ *				Once the item name is entered it retrieves item data to allow user to edit
+ *				expiration date, quantity, min quantity and max quantity.
+ *
+ ** Revisions:
+ *  1.0		09/21/2021		MC			Coded based on pseudocode 
+ *	1.1		09/27/2021		MC			Added graceful error handling, added cancel buttons to pop ups and messages
+ *										to handle them, Added comments and javadocs
+ *
+ *
+ **/
+
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.PreparedStatement;
 import java.sql.Statement;
 
 import javax.swing.BorderFactory;
@@ -16,13 +32,17 @@ import javax.swing.JTextField;
 
 public class UpdateItem {
 
+	/**
+	 * updateInvItem:	Allows user to enter an item name to update item data.
+	 * @param con:		connection
+	 */
 	public static void updateInvItem(Connection con) {
 		JTextField nameTxt = new JTextField(20);
 		JLabel nameLbl= new JLabel();
 		JPanel addPanel = new JPanel();
 		addPanel.setPreferredSize(new Dimension(350, 100));
 
-		String[] options = {"Retrieve Item Data"};
+		String[] options = {"Retrieve Item Data","Cancel"};
 		int n = 0;
 		
 		String itemName;
@@ -40,18 +60,17 @@ public class UpdateItem {
 				itemName = nameTxt.getText();
 				retrieveItemData(con, itemName);
 			} catch (Exception e) {
-				System.out.println(e);
 				JOptionPane jf = new JOptionPane();
-				JOptionPane.showMessageDialog(jf, "Error:" + e + " Please try again.");
+				JOptionPane.showMessageDialog(jf, "Error processing request. Please try again.");
 			}
 		}
 	}
 
 	/**
-	 * enterInput: The JoptionPane that is displayed for user to enter input
-	 * @param name: The name of the shape
-	 * @param panel: Panel storing text fields and labels
-	 * @param options: The OK button on bottom of panel
+	 * enterInput: 		The JoptionPane that is displayed for user to enter input
+	 * @param name: 	The name of the shape
+	 * @param panel: 	Panel storing text fields and labels
+	 * @param options: 	The OK button on bottom of panel
 	 * @return integer
 	 */
 	private static int enterInput(String name, JPanel panel, String[] options) {
@@ -61,7 +80,13 @@ public class UpdateItem {
 		return n;
 	}
 
-	public static void retrieveItemData(Connection con, String name) throws SQLException {
+	/**
+	 * retrieveItemData:	Retrieves item data for item name entered. Expiration date, quantity in stock,
+	 * 						min quantity and max quantity can be editted.
+	 * @param con:			connection
+	 * @param name:			item name
+	 */
+	public static void retrieveItemData(Connection con, String name) {
 		JTextField update1Txt = new JTextField(10);
 		update1Txt.setEditable(false);
 		JTextField update2Txt = new JTextField(10);
@@ -73,7 +98,7 @@ public class UpdateItem {
 		JTextField update5Txt = new JTextField(10);
 		update5Txt.setEditable(true);
 		
-		String[] options = {"update","Cancel"};
+		String[] options = {"Update","Cancel"};
 		
 		JLabel update1Lbl, update2Lbl, update3Lbl, update4Lbl, update5Lbl; 
 		JPanel updatePanel = new JPanel();
@@ -96,52 +121,81 @@ public class UpdateItem {
 		updatePanel.add(update5Lbl);
 		updatePanel.add(update5Txt);
 		
-		String sql = "SELECT * from mcbfood WHERE item_name = " + "'" + name + "';";
-		Statement stmt = con.createStatement();
-		ResultSet rs = stmt.executeQuery(sql);
-		String itemName;
-    	Date itemDate = null;
-    	int qty = 0;
-    	int minQty = 0;
-    	int maxQty = 0;
-        while (rs.next()) {
-        	itemName = rs.getString("item_name");
-        	itemDate = rs.getDate("item_date");
-        	qty = rs.getInt("amount");
-        	minQty = rs.getInt("min_amount");
-        	maxQty = rs.getInt("max_amount");
-        	
-        	update1Txt.setText(itemName);
-        	update2Txt.setText(itemDate.toString());
-        	update3Txt.setText(Integer.toString(qty));
-        	update4Txt.setText(Integer.toString(minQty));
-        	update5Txt.setText(Integer.toString(maxQty));
-        }	
-		String rptName = "Item Data";
-		int n = JOptionPane.showOptionDialog(null, updatePanel, rptName, JOptionPane.NO_OPTION, 
-				JOptionPane.QUESTION_MESSAGE, null, options , options[0]);
-		if (n == 0) {
-			Date updateDate = Date.valueOf(update2Txt.getText());
-			int updateQty = Integer.parseInt(update3Txt.getText());
-			int updateMin = Integer.parseInt(update4Txt.getText());
-			int updateMax = Integer.parseInt(update5Txt.getText());
-			updateItemDatabase(con, name, updateDate, updateQty, updateMin, updateMax);
+		String sql = "SELECT * from Inventory WHERE item_name = " + "'" + name + "';";
+		System.out.println(name + " " + sql);
+		String itemName = null;
+		Date itemDate = null;
+		int qty = 0;
+		int minQty = 0;
+		int maxQty = 0;
+
+		try {
+			Statement stmt = con.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				itemName = rs.getString("item_name");
+				itemDate = rs.getDate("exp_date");
+				qty = rs.getInt("qty_in_stock");
+				minQty = rs.getInt("min_qty");
+				maxQty = rs.getInt("max_qty");
+
+				update1Txt.setText(itemName);
+				update2Txt.setText(itemDate.toString());
+				update3Txt.setText(Integer.toString(qty));
+				update4Txt.setText(Integer.toString(minQty));
+				update5Txt.setText(Integer.toString(maxQty));
+			}
+			if ((itemName != null) && (!itemName.isEmpty())) {
+				String rptName = "Item Data";
+				int n = JOptionPane.showOptionDialog(null, updatePanel, rptName, JOptionPane.NO_OPTION,
+						JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+				if (n == 0) {
+					// TODO: error check fields
+					Date updateDate = Date.valueOf(update2Txt.getText());
+					int updateQty = Integer.parseInt(update3Txt.getText());
+					int updateMin = Integer.parseInt(update4Txt.getText());
+					int updateMax = Integer.parseInt(update5Txt.getText());
+					updateItemDatabase(con, name, updateDate, updateQty, updateMin, updateMax);
+				}
+			} else {
+				JOptionPane jf = new JOptionPane();
+				JOptionPane.showMessageDialog(jf, "Item is not in table.");
+			}
+		} catch (SQLException e) {
+			JOptionPane jf = new JOptionPane();
+			JOptionPane.showMessageDialog(jf, "Error processing your request. Please try again.");
 		}
+
 	}
 	
-	private static void updateItemDatabase(Connection con, String itemName, Date itemDate, int qty, int minQty, int maxQty)
-			throws SQLException {
-        Statement stmt = con.createStatement();
-        String sql = "UPDATE mcbfood SET item_date = " + "'" + itemDate + "'" 
-        		+ ", amount = " + qty  + ", min_amount = " + minQty 
-        		+ ", max_amount = " + maxQty + " WHERE item_name = " + "'" + itemName + "'";
-        int rs = stmt.executeUpdate(sql);
-        if (rs==1) {
-        	JOptionPane jf = new JOptionPane();
-			JOptionPane.showMessageDialog(jf, "Successfully updated");
-        } else {
-        	JOptionPane jf = new JOptionPane();
-			JOptionPane.showMessageDialog(jf, "Could not update item");
-        }
+	/**
+	 * updateItemDatabase:	Updates the item data based on what was entered in texts fields and calls the database
+	 * 						with an update sql call.
+	 * @param con:			Connection
+	 * @param itemName:		Item Name
+	 * @param itemDate:		Expiration Date
+	 * @param qty:			Quantity in Stock
+	 * @param minQty:		Minimum Quantity to keep on hand
+	 * @param maxQty:		Maximum Quantity allowed to be stored
+	 */
+	private static void updateItemDatabase(Connection con, String itemName, Date itemDate, int qty, int minQty, int maxQty) {
+        String sql = "UPDATE Inventory SET exp_date = " + "'" + itemDate + "'" 
+        		+ ", qty_in_stock = " + qty  + ", min_qty = " + minQty 
+        		+ ", max_qty = " + maxQty + " WHERE item_name = " + "'" + itemName + "'";
+        PreparedStatement stmt;
+		try {
+			stmt = con.prepareStatement(sql);
+			int rs = stmt.executeUpdate();
+			if (rs==1) {
+				JOptionPane jf = new JOptionPane();
+				JOptionPane.showMessageDialog(jf, "Successfully updated");
+	        } else {
+	        	JOptionPane jf = new JOptionPane();
+				JOptionPane.showMessageDialog(jf, "Could not update item");
+	        }
+		} catch (Exception e){
+			JOptionPane jf = new JOptionPane();
+			JOptionPane.showMessageDialog(jf, "Error processing your request. Please try again.");
+		}
 	}
 }
