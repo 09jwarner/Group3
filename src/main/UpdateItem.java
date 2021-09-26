@@ -122,7 +122,6 @@ public class UpdateItem {
 		updatePanel.add(update5Txt);
 		
 		String sql = "SELECT * from Inventory WHERE item_name = " + "'" + name + "';";
-		System.out.println(name + " " + sql);
 		String itemName = null;
 		Date itemDate = null;
 		int qty = 0;

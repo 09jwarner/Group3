@@ -192,31 +192,6 @@ public class PantryGUI extends JFrame {
 				}
 			});
 
-			expiredBtn.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent event) {
-					sql = "SELECT * from Inventory WHERE exp_date <= '" + datePlusDays + "'";
-					reportName = "Expired Inventory";
-					InventoryReport.displayInvReport(con, sql, reportName);
-				}
-			});
-
-			lowInvBtn.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent event) {
-					sql = "SELECT * from Inventory WHERE amount <= min_qty";
-					reportName = "Low Inventory";
-					InventoryReport.displayInvReport(con, sql, reportName);
-				}
-			});
-
-			// Listener method for exit button
-			exitBtn.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent event) {
-					exitBtnAction(event, con);
-				}
-			});
 		}
 	}
 
