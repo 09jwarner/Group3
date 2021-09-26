@@ -1,11 +1,29 @@
 package main;
 
+/** File: 		AddItem.java
+ ** Author: 	Group 3 Heather, John and MC
+ ** Date: 		10/10/2021
+ ** Purpose: 	This class contains methods to add items to the inventory table
+ **				
+ **				
+ ** Revisions:
+ *	1.0		09/23/2021		????		File created
+ *	1.1		09/25/2021 		Heather		Converted Statement to PreparedStatement, added cancel button, error handling and hiding of exceptions in user popups/user friendly messages
+ *	
+ *
+ *
+ **/
+
+
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Window;
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.SQLIntegrityConstraintViolationException;
+
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -30,14 +48,15 @@ public class AddItem {
 		addPanel.setLayout(new GridLayout(5, 1, 50, 20));
 		addPanel.setPreferredSize(new Dimension(500, 250));
 
-		String[] options = {"OK"};
+		String[] options = {"OK","Cancel"};
 		int n = 0;
 		
-		String input1;
-		String input2;
-		int input3;
-		int input4;
-		int input5;  
+		String inputItem;
+		String inputDate;
+		Date itemDate;
+		int inputQty;
+		int inputMin;
+		int inputMax;
 		
 		add1Lbl = new JLabel("Enter Item Name: ");
 		addPanel.add(add1Lbl);
@@ -45,38 +64,57 @@ public class AddItem {
 		add2Lbl = new JLabel("Enter Date(YYYY-MM-DD): ");
 		addPanel.add(add2Lbl);
 		addPanel.add(add2Txt);
-		add3Lbl = new JLabel("Enter Amount: ");
+		add3Lbl = new JLabel("Enter Quantity: ");
 		addPanel.add(add3Lbl);
 		addPanel.add(add3Txt);
-		add4Lbl = new JLabel("Enter Min Amount: ");
+		add4Lbl = new JLabel("Enter Min Quantity: ");
 		addPanel.add(add4Lbl);
 		addPanel.add(add4Txt);
-		add5Lbl = new JLabel("Enter Max Amount: ");
+		add5Lbl = new JLabel("Enter Max Quantity: ");
 		addPanel.add(add5Lbl);
 		addPanel.add(add5Txt);
 		addPanel.setBorder(BorderFactory.createTitledBorder("Add Inventory:"));
 
 		String name = "Add Item";
-		n = enterInput(name, addPanel, options);
-		if (n == 0) {
-			try {
-				input1 = add1Txt.getText();
-				input2 = add2Txt.getText();
-				input3 = Integer.parseInt(add3Txt.getText());
-				input4 = Integer.parseInt(add4Txt.getText());
-				input5 = Integer.parseInt(add5Txt.getText());
-				addToDatabase(con, input1, input2, input3, input4, input5);
-			} catch (Exception e) {
-				System.out.println(e);
-				JOptionPane jf = new JOptionPane();
-				JOptionPane.showMessageDialog(jf, "Error:" + e + " Please try again.");
+		// Prompt user until they get input correct
+		while (true) {
+			n = enterInput(name, addPanel, options);
+
+			if (n == 0) {
+				try {
+					//TODO Input validation
+					inputItem = add1Txt.getText();
+					inputDate = add2Txt.getText();
+					itemDate = Date.valueOf(inputDate);
+					inputQty = Integer.parseInt(add3Txt.getText());
+					inputMin = Integer.parseInt(add4Txt.getText());
+					inputMax = Integer.parseInt(add5Txt.getText());
+					addToDatabase(con, inputItem, itemDate, inputQty, inputMin, inputMax);
+					break;
+				// Catch for date and number format errors
+				} catch (IllegalArgumentException e) {
+					System.out.println(e);
+					JOptionPane jf = new JOptionPane();
+					JOptionPane.showMessageDialog(jf, "You have entered an invalid value for one of the fields!\n Quantities must be whole numbers and date must be in YYYY-MM-DD format!");
+					continue;
+				} catch (SQLException e) {
+					JOptionPane jf = new JOptionPane();
+					JOptionPane.showMessageDialog(jf, "A connection error has occured. Try again or contact support.");
+				}
+			// Cancel button
+			} else {
+				// Get the current window and close it
+				Window activeWindow = java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
+				activeWindow.dispose();
+				break;
 			}
 		}
+
 	}
 
 	/**
 	 * enterInput: The JoptionPane that is displayed for user to enter input
-	 * @param name: The name of the shape
+	 * @param name: The name of the window
 	 * @param panel: Panel storing text fields and labels
 	 * @param options: The OK button on bottom of panel
 	 * @return integer
@@ -88,20 +126,34 @@ public class AddItem {
 		return n;
 	}
 
-	private static void addToDatabase(Connection con, String userName, String date, int qty, 
-			int minQty, int maxQty) throws SQLException {
-        Statement stmt = con.createStatement();
-        //mcbfood
-        Date itemDate=Date.valueOf(date);
-        String sql = "INSERT INTO mcbfood (item_name, item_date, amount, min_amount, max_amount) "
-         		+ "VALUES ('" +userName + "','" + itemDate + "',"+ qty + ","+ minQty + ","+ maxQty +")";
-        int rs = stmt.executeUpdate(sql);
-        if (rs==1) {
-        	JOptionPane jf = new JOptionPane();
-			JOptionPane.showMessageDialog(jf, "Successfully added");
-        } else {
-        	JOptionPane jf = new JOptionPane();
-			JOptionPane.showMessageDialog(jf, "Could not add item");
-        }
+	private static void addToDatabase(Connection con, String itemName, Date itemDate, int qty, int minQty, int maxQty)
+			throws SQLException {
+		try {
+
+			String sql = "INSERT INTO Inventory " + "VALUES (?,?,?,?,?)";
+			PreparedStatement pStmt = con.prepareStatement(sql);
+			pStmt.setString(1, itemName);
+			pStmt.setDate(2, itemDate);
+			pStmt.setInt(3, qty);
+			pStmt.setInt(4, minQty);
+			pStmt.setInt(5, maxQty);
+
+			int result = pStmt.executeUpdate();
+
+			// Use execute return value to determine if item was added
+			if (result == 1) {
+				JOptionPane jf = new JOptionPane();
+				JOptionPane.showMessageDialog(jf, "Successfully added");
+			// Will catch if connection issues
+			} else {
+				JOptionPane jf = new JOptionPane();
+				JOptionPane.showMessageDialog(jf, "Could not add item");
+			}
+		// Exception if item exists already	
+		} catch (SQLIntegrityConstraintViolationException ce) {
+			JOptionPane jf = new JOptionPane();
+			JOptionPane.showMessageDialog(jf,
+					"Item already exists! \nPlease enter a unique item or update the item if it already exists.");
+		}
 	}
 }
