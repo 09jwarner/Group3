@@ -144,18 +144,26 @@ public class UpdateItem {
 				update4Txt.setText(Integer.toString(minQty));
 				update5Txt.setText(Integer.toString(maxQty));
 			}
+			boolean notUpdated = false;
 			if ((itemName != null) && (!itemName.isEmpty())) {
-				String rptName = "Item Data";
-				int n = JOptionPane.showOptionDialog(null, updatePanel, rptName, JOptionPane.NO_OPTION,
-						JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-				if (n == 0) {
-					// TODO: error check fields
-					Date updateDate = Date.valueOf(update2Txt.getText());
-					int updateQty = Integer.parseInt(update3Txt.getText());
-					int updateMin = Integer.parseInt(update4Txt.getText());
-					int updateMax = Integer.parseInt(update5Txt.getText());
-					updateItemDatabase(con, name, updateDate, updateQty, updateMin, updateMax);
+				while (!notUpdated) {
+					String rptName = "Item Data";
+					int n = JOptionPane.showOptionDialog(null, updatePanel, rptName, JOptionPane.NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+					if (n == 0) {
+						Date updateDate = Date.valueOf(update2Txt.getText());
+						int updateQty = Integer.parseInt(update3Txt.getText());
+						int updateMin = Integer.parseInt(update4Txt.getText());
+						int updateMax = Integer.parseInt(update5Txt.getText());
+						if (checkQuantity(updateQty, updateMin, updateMax)) {
+							notUpdated = updateItemDatabase(con, name, updateDate, updateQty, updateMin, updateMax);
+						} else {
+							JOptionPane jf = new JOptionPane();
+							JOptionPane.showMessageDialog(jf, "Quantities must be <= 30. Please Try Again");
+						}
+					}
 				}
+
 			} else {
 				JOptionPane jf = new JOptionPane();
 				JOptionPane.showMessageDialog(jf, "Item is not in table.");
@@ -177,17 +185,27 @@ public class UpdateItem {
 	 * @param minQty:		Minimum Quantity to keep on hand
 	 * @param maxQty:		Maximum Quantity allowed to be stored
 	 */
-	private static void updateItemDatabase(Connection con, String itemName, Date itemDate, int qty, int minQty, int maxQty) {
-        String sql = "UPDATE Inventory SET exp_date = " + "'" + itemDate + "'" 
-        		+ ", qty_in_stock = " + qty  + ", min_qty = " + minQty 
-        		+ ", max_qty = " + maxQty + " WHERE item_name = " + "'" + itemName + "'";
-        PreparedStatement stmt;
-		try {
-			stmt = con.prepareStatement(sql);
-			int rs = stmt.executeUpdate();
+	private static boolean updateItemDatabase(Connection con, String itemName, Date itemDate, int qty, int minQty, int maxQty) {
+ 		
+		String sql = "UPDATE Inventory SET exp_date = ?, qty_in_stock = ?, min_qty = ?, max_qty = ? WHERE item_name = ?";
+        PreparedStatement pStmt;
+        boolean successfulUpdate = false;
+
+        try {
+			pStmt = con.prepareStatement(sql);
+			pStmt.setDate(1, itemDate);
+			pStmt.setInt(2, qty);
+			pStmt.setInt(3, minQty);
+			pStmt.setInt(4, maxQty);
+			pStmt.setString(5, itemName);
+			
+			int rs = pStmt.executeUpdate();
+			
+			// Use execute return value to determine if item was added
 			if (rs==1) {
 				JOptionPane jf = new JOptionPane();
 				JOptionPane.showMessageDialog(jf, "Successfully updated");
+				successfulUpdate = true;
 	        } else {
 	        	JOptionPane jf = new JOptionPane();
 				JOptionPane.showMessageDialog(jf, "Could not update item");
@@ -196,5 +214,15 @@ public class UpdateItem {
 			JOptionPane jf = new JOptionPane();
 			JOptionPane.showMessageDialog(jf, "Error processing your request. Please try again.");
 		}
+        
+        return successfulUpdate;
+	}
+	
+	private static boolean checkQuantity(int updateQty, int updateMin, int updateMax) {
+		boolean maxQtyAllowed = false;
+		if ((updateQty <= 30) && (updateMin <= 30) && (updateMax <= 30)) {
+			maxQtyAllowed = true;
+		}
+		return maxQtyAllowed;
 	}
 }
