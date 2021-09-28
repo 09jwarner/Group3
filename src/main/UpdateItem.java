@@ -17,12 +17,14 @@ package main;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Window;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.time.LocalDate;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -54,15 +56,23 @@ public class UpdateItem {
 		
 
 		String name = "Update Item";
+		while (true) {
 		n = enterInput(name, addPanel, options);
 		if (n == 0) {
 			try {
 				itemName = nameTxt.getText();
-				retrieveItemData(con, itemName);
+				if (checkName(itemName)) {
+					retrieveItemData(con, itemName);	
+				}
 			} catch (Exception e) {
 				JOptionPane jf = new JOptionPane();
 				JOptionPane.showMessageDialog(jf, "Error processing request. Please try again.");
 			}
+		} else {
+			Window activeWindow = java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
+			activeWindow.dispose();
+			break;
+		}
 		}
 	}
 
@@ -144,9 +154,9 @@ public class UpdateItem {
 				update4Txt.setText(Integer.toString(minQty));
 				update5Txt.setText(Integer.toString(maxQty));
 			}
-			boolean notUpdated = false;
+			boolean updated = false;
 			if ((itemName != null) && (!itemName.isEmpty())) {
-				while (!notUpdated) {
+				while (!updated) {
 					String rptName = "Item Data";
 					int n = JOptionPane.showOptionDialog(null, updatePanel, rptName, JOptionPane.NO_OPTION,
 							JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
@@ -155,12 +165,14 @@ public class UpdateItem {
 						int updateQty = Integer.parseInt(update3Txt.getText());
 						int updateMin = Integer.parseInt(update4Txt.getText());
 						int updateMax = Integer.parseInt(update5Txt.getText());
-						if (checkQuantity(updateQty, updateMin, updateMax)) {
-							notUpdated = updateItemDatabase(con, name, updateDate, updateQty, updateMin, updateMax);
-						} else {
-							JOptionPane jf = new JOptionPane();
-							JOptionPane.showMessageDialog(jf, "Quantities must be <= 30. Please Try Again");
+						//boolean checkFields for quantity <= 30, date, min <= max 
+						if (checkFields(updateQty, updateMin, updateMax, updateDate)) {
+							updated = updateItemDatabase(con, name, updateDate, updateQty, updateMin, updateMax);
 						}
+					} else {
+						Window activeWindow = java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
+						activeWindow.dispose();
+						break;	
 					}
 				}
 
@@ -218,11 +230,67 @@ public class UpdateItem {
         return successfulUpdate;
 	}
 	
-	private static boolean checkQuantity(int updateQty, int updateMin, int updateMax) {
-		boolean maxQtyAllowed = false;
-		if ((updateQty <= 30) && (updateMin <= 30) && (updateMax <= 30)) {
-			maxQtyAllowed = true;
+	/**
+	 * checkFields: checks the fields to make sure that meet criteria
+	 * @param updateQty: quantity in stock
+	 * @param updateMin: min quantity to be kept on hand
+	 * @param updateMax: maximum quantity to be kept on hand
+	 * @param updateDate: expiration date
+	 * @return boolean
+	 */
+	private static boolean checkFields(int updateQty, int updateMin, int updateMax, Date updateDate) {
+		LocalDate currDate = LocalDate.now();
+		LocalDate updateExpDate = updateDate.toLocalDate();
+		
+		boolean maxQtyCheck = false;
+		boolean minMaxCheck = false;
+		boolean dateCheck = false;
+		boolean checkFields = false;
+		
+		if ((updateQty > 0 && updateQty <= 30) && (updateMin > 0 && updateMin <= 30) && 
+				(updateMax > 0 && updateMax <= 30)) {
+			maxQtyCheck = true;
+		} else {
+			JOptionPane jf = new JOptionPane();
+			JOptionPane.showMessageDialog(jf, "Quantities must be <= 30. Please Try Again");	
 		}
-		return maxQtyAllowed;
+		
+		if (updateMin <= updateMax) {
+			minMaxCheck = true;
+		} else {
+			JOptionPane jf = new JOptionPane();
+			JOptionPane.showMessageDialog(jf, "Min Quantity must be less than Max Qunatity.");	
+		}
+		
+		if (updateExpDate.compareTo(currDate) >= 0) {
+			dateCheck = true;
+		} else {
+			JOptionPane jf = new JOptionPane();
+			JOptionPane.showMessageDialog(jf, "Expiration Date must be >= Today.");	
+		}
+		
+		if ((maxQtyCheck) && (minMaxCheck) && (dateCheck)) {
+			checkFields = true;
+		}
+		
+		return checkFields;
+	}
+	
+	/**
+	 * checkName:	checks the name length to make sure <= 30 characters
+	 * @param updateNm: name entered
+	 * @return boolean
+	 */
+	private static boolean checkName(String updateNm) {
+		boolean nameCheck = false;
+		
+		if (updateNm.length() <= 30) {
+			nameCheck = true;
+		} else {
+			JOptionPane jf = new JOptionPane();
+			JOptionPane.showMessageDialog(jf, "Name length must be <= 30.");	
+		}
+		
+		return nameCheck;
 	}
 }

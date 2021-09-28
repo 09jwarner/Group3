@@ -283,7 +283,7 @@ public class PantryGUI extends JFrame {
 		int count = 0;
 		Connection con = null;
 
-		while (count <= 5) {
+		while (count <= 3) {
 			JTextField userTxt = new JTextField(20);
 			JLabel userLbl = new JLabel();
 			// JTextField pswdTxt = new JTextField(20);
@@ -312,7 +312,7 @@ public class PantryGUI extends JFrame {
 				System.exit(EXIT_ON_CLOSE);
 			}
 			if (con != null) {
-				count = 6;
+				count = 4;
 			} else {
 				count++;
 			}
@@ -340,11 +340,11 @@ public class PantryGUI extends JFrame {
 		} catch (Exception e) {
 			JOptionPane jf = new JOptionPane();
 			JOptionPane.showMessageDialog(jf, "Your user name or password is incorrect. Please try again.");
-			if (count == 4) {
+			if (count == 2) {
 				JOptionPane.showMessageDialog(jf,
 						"You have had 4 unsuccessful logins. You have one more attempt to login.");
 			}
-			if (count == 5) {
+			if (count == 3) {
 				System.exit(EXIT_ON_CLOSE);
 			}
 		}
