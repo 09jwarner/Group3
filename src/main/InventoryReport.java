@@ -7,9 +7,9 @@ package main;
  **				
  **				
  ** Revisions:
- *	1.0 	09/23/2021		??????		File created 
+ *	1.0 	09/21/2021		Heather		Started coding based on pseudocode 
  *	1.1		09/25/2021 		Heather		Updated table column names to match table
- *	
+ *	1.2 	09/26/2021		Heather		Added Javadoc and comments
  *
  *
  **/
@@ -31,7 +31,12 @@ public class InventoryReport {
 
 	static String[] columnNames = { "item_name", "exp_date", "qty_in_stock", "min_qty", "max_qty" };
 	
-
+	/**
+	 * displayInvReport: A report with relevant rows is displayed based on the user selection
+	 * @param con: The active JDBC connection to the database
+	 * @param sql: The SQL statement to be used based on the type of report requested
+	 * @param reportName: Report title based on type of report
+	 */
 	public static void displayInvReport(Connection con, String sql, String reportName) {
 		try {
 			DefaultTableModel dtm = new DefaultTableModel(columnNames, 0);

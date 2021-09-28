@@ -7,10 +7,9 @@ package main;
  **				
  **				
  ** Revisions:
- *	1.0		09/23/2021		????		File created
+ *	1.0		09/21/2021		Heather		Started code based on pseudocode
  *	1.1		09/25/2021 		Heather		Converted Statement to PreparedStatement, added cancel button, error handling and hiding of exceptions in user popups/user friendly messages
- *	
- *
+ *	1.2		09/26/2021		John		Added input validation for all user fields
  *
  **/
 
@@ -32,7 +31,11 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class AddItem {
-
+	
+	/**
+	 * addInvItem: Constructs the Add GUI, validates user input
+	 * @param con: JDBC connection
+	 */
 	public static void addInvItem(Connection con) {
 		JTextField add1Txt = new JTextField(10);
 		JLabel add1Lbl= new JLabel();
@@ -83,7 +86,6 @@ public class AddItem {
 			if (n == 0) {
 				try {
 					
-					//TODO Input validation
 					inputItem = add1Txt.getText();
 					if (inputItem.length() > 30) {
 						JOptionPane jf = new JOptionPane();
@@ -164,6 +166,16 @@ public class AddItem {
 		return n;
 	}
 
+	/**
+	 * addToDatabase: Constructs an injection safe SQL statement to insert a new row into the database
+	 * @param con
+	 * @param itemName: New unique item name
+	 * @param itemDate: Expiration Date
+	 * @param qty: Quantity on hand
+	 * @param minQty: Minimum quantity to keep in stock
+	 * @param maxQty: Maximum quantity to keep in stock
+	 * @throws SQLException
+	 */	
 	private static void addToDatabase(Connection con, String itemName, Date itemDate, int qty, int minQty, int maxQty)
 			throws SQLException {
 		try {
