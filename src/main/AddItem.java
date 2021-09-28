@@ -174,7 +174,7 @@ public class AddItem {
 	 * @param qty: Quantity on hand
 	 * @param minQty: Minimum quantity to keep in stock
 	 * @param maxQty: Maximum quantity to keep in stock
-	 * @throws SQLException
+	 * @throws SQLException 
 	 */	
 	private static void addToDatabase(Connection con, String itemName, Date itemDate, int qty, int minQty, int maxQty)
 			throws SQLException {

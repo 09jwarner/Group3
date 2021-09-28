@@ -1,6 +1,6 @@
 package main;
 
-/** File: 		AddItem.java
+/** File: 		AddItem.java 
  ** Author: 	Group 3 Heather, John and MC
  ** Date: 		10/10/2021
  ** Purpose: 	This class contains methods to add items to the inventory table

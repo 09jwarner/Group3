@@ -1,6 +1,6 @@
 package main;
 
-/** File: 		InventoryReport.java
+/** File: 		InventoryReport.java 
  ** Author: 	Group 3 Heather, John and MC
  ** Date: 		10/10/2021
  ** Purpose: 	This class contains methods to retrieve all rows from the Inventory table
