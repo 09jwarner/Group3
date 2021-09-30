@@ -13,6 +13,7 @@ package main;
  *  1.3		09/27/2021		MC			Added 5 login attempts, added graceful error handling, updated dimensions
  *										to make gui cleaner looking, changed to preparedstement instead of statement,
  *										added comments and javadocs
+ *	1.4		09/29/2021		MC			Changed login to 3x, added text to alert buttons, changed title to Food Truck
  *
  *
  **/
@@ -62,7 +63,7 @@ public class PantryGUI extends JFrame {
 		Connection con = getCredentials();
 
 		if (con != null) {
-			setTitle("Group 3 Pantry");
+			setTitle("Group 3 Food Truck Inventory");
 			setSize(W, H);
 			setLocationRelativeTo(null);
 			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -77,7 +78,7 @@ public class PantryGUI extends JFrame {
 			JPanel buttonsPanel = new JPanel();
 			buttonsPanel.setLayout(new GridLayout(3, 2, 40, 20));
 			buttonsPanel.setPreferredSize(new Dimension(150, 75));
-			buttonsPanel.setBorder(BorderFactory.createTitledBorder("Pantry Actions:"));
+			buttonsPanel.setBorder(BorderFactory.createTitledBorder("Food Truck Actions:"));
 			buttonsPanel.add(showBtn);
 			buttonsPanel.add(addBtn);
 			buttonsPanel.add(deleteBtn);
@@ -213,7 +214,7 @@ public class PantryGUI extends JFrame {
 				} else {
 					expiredAlert.setBackground(null);
 					expiredAlert.setText("No Expired Items!");
-					expiredBtn.setText("");
+					expiredBtn.setText("Click to See Expired Items");
 				}
 			} catch (SQLException e) {
 				JOptionPane jf = new JOptionPane();
@@ -240,7 +241,7 @@ public class PantryGUI extends JFrame {
 				} else {
 					lowInvAlert.setBackground(null);
 					lowInvAlert.setText("Inventory all Good!");
-					lowInvBtn.setText("");
+					lowInvBtn.setText("Click to See Low Inventory");
 				}
 			} catch (SQLException e) {
 				JOptionPane jf = new JOptionPane();

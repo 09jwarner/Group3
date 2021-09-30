@@ -11,6 +11,7 @@ package main;
  *  1.0		09/21/2021		MC			Coded based on pseudocode 
  *	1.1		09/27/2021		MC			Added graceful error handling, added cancel buttons to pop ups and messages
  *										to handle them, Added comments and javadocs
+ *	1.2		09/29/2021		MC			Fixed endless loop; added checks for fields entered and name
  *
  *
  **/
@@ -56,23 +57,24 @@ public class UpdateItem {
 		
 
 		String name = "Update Item";
-		while (true) {
-		n = enterInput(name, addPanel, options);
-		if (n == 0) {
-			try {
-				itemName = nameTxt.getText();
-				if (checkName(itemName)) {
-					retrieveItemData(con, itemName);	
+		boolean isUpdated = false;
+		while (!isUpdated) {
+			n = enterInput(name, addPanel, options);
+			if (n == 0) {
+				try {
+					itemName = nameTxt.getText();
+					if (checkName(itemName)) {
+						isUpdated = retrieveItemData(con, itemName);	
+					}
+				} catch (Exception e) {
+					JOptionPane jf = new JOptionPane();
+					JOptionPane.showMessageDialog(jf, "Error processing request. Please try again.");
 				}
-			} catch (Exception e) {
-				JOptionPane jf = new JOptionPane();
-				JOptionPane.showMessageDialog(jf, "Error processing request. Please try again.");
+			} else {
+				Window activeWindow = java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
+				activeWindow.dispose();
+				break;
 			}
-		} else {
-			Window activeWindow = java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
-			activeWindow.dispose();
-			break;
-		}
 		}
 	}
 
@@ -96,7 +98,7 @@ public class UpdateItem {
 	 * @param con:			connection
 	 * @param name:			item name
 	 */
-	public static void retrieveItemData(Connection con, String name) {
+	public static boolean retrieveItemData(Connection con, String name) {
 		JTextField update1Txt = new JTextField(10);
 		update1Txt.setEditable(false);
 		JTextField update2Txt = new JTextField(10);
@@ -137,7 +139,8 @@ public class UpdateItem {
 		int qty = 0;
 		int minQty = 0;
 		int maxQty = 0;
-
+		boolean updated = false;
+		
 		try {
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
@@ -154,7 +157,6 @@ public class UpdateItem {
 				update4Txt.setText(Integer.toString(minQty));
 				update5Txt.setText(Integer.toString(maxQty));
 			}
-			boolean updated = false;
 			if ((itemName != null) && (!itemName.isEmpty())) {
 				while (!updated) {
 					String rptName = "Item Data";
@@ -184,7 +186,7 @@ public class UpdateItem {
 			JOptionPane jf = new JOptionPane();
 			JOptionPane.showMessageDialog(jf, "Error processing your request. Please try again.");
 		}
-
+		return updated;
 	}
 	
 	/**

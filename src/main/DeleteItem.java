@@ -127,8 +127,7 @@ public class DeleteItem {
 		String itemName = null;
 		try {
 			stmt = con.createStatement();
-			ResultSet rs;
-			rs = stmt.executeQuery(sql);
+			ResultSet rs = stmt.executeQuery(sql);
 			while (rs.next()) {
 				itemName = rs.getString("item_name");
 				del1Txt.setText(rs.getString("item_name"));
