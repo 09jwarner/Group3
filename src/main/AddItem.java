@@ -22,7 +22,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
-
+import java.time.LocalDate;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -129,6 +129,21 @@ public class AddItem {
 						JOptionPane.showMessageDialog(jf, "The Maximum Quantity cannot be greater than 30 items.");
 						break;
 					}
+					/*
+					 *  Test for Expiration Date is later than today's date.
+					 *  Convert inputDate String to Date type
+					 *  Get today's date
+					 *  
+					 */
+					Date updateDate = Date.valueOf(inputDate);
+					LocalDate currDate = LocalDate.now();
+					LocalDate updateExpDate = updateDate.toLocalDate();
+					if (updateExpDate.compareTo(currDate) < 0) {
+						JOptionPane jf = new JOptionPane();
+						JOptionPane.showMessageDialog(jf, "Expiration Date must be today's date or later.");
+						break;
+					}
+					
 					addToDatabase(con, inputItem, itemDate, inputQty, inputMin, inputMax);
 					break;
 				// Catch for date and number format errors
