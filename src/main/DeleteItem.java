@@ -58,7 +58,12 @@ public class DeleteItem {
 			try {
 				//error check test field
 				itemName = nameTxt.getText();
-				retrieveItemData(con, itemName);
+				if(itemName.length() > 30) {
+						JOptionPane jf = new JOptionPane();
+						JOptionPane.showMessageDialog(jf, "Item Name's length is grearter than the allowed character lenght.");
+				}
+				else
+					retrieveItemData(con, itemName);
 			} catch (Exception e) {
 				System.out.println(e);
 				JOptionPane jf = new JOptionPane();
@@ -127,7 +132,8 @@ public class DeleteItem {
 		String itemName = null;
 		try {
 			stmt = con.createStatement();
-			ResultSet rs = stmt.executeQuery(sql);
+			ResultSet rs;
+			rs = stmt.executeQuery(sql);
 			while (rs.next()) {
 				itemName = rs.getString("item_name");
 				del1Txt.setText(rs.getString("item_name"));
