@@ -163,18 +163,26 @@ public class UpdateItem {
 					int n = JOptionPane.showOptionDialog(null, updatePanel, rptName, JOptionPane.NO_OPTION,
 							JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 					if (n == 0) {
-						Date updateDate = Date.valueOf(update2Txt.getText());
-						int updateQty = Integer.parseInt(update3Txt.getText());
-						int updateMin = Integer.parseInt(update4Txt.getText());
-						int updateMax = Integer.parseInt(update5Txt.getText());
-						//boolean checkFields for quantity <= 30, date, min <= max 
-						if (checkFields(updateQty, updateMin, updateMax, updateDate)) {
-							updated = updateItemDatabase(con, name, updateDate, updateQty, updateMin, updateMax);
+						try {
+							Date updateDate = Date.valueOf(update2Txt.getText());
+							int updateQty = Integer.parseInt(update3Txt.getText());
+							int updateMin = Integer.parseInt(update4Txt.getText());
+							int updateMax = Integer.parseInt(update5Txt.getText());
+							// boolean checkFields for quantity <= 30, date, min <= max
+							if (checkFields(updateQty, updateMin, updateMax, updateDate)) {
+								updated = updateItemDatabase(con, name, updateDate, updateQty, updateMin, updateMax);
+							}
+						}catch (IllegalArgumentException e) {
+							JOptionPane jf = new JOptionPane();
+							JOptionPane.showMessageDialog(jf, "You have entered an invalid value for one of the fields!\n Quantities must be whole numbers and date must be in YYYY-MM-DD format!");
+							continue;
 						}
+					//cancel
 					} else {
 						Window activeWindow = java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
 						activeWindow.dispose();
 						break;	
+					
 					}
 				}
 
@@ -184,7 +192,7 @@ public class UpdateItem {
 			}
 		} catch (SQLException e) {
 			JOptionPane jf = new JOptionPane();
-			JOptionPane.showMessageDialog(jf, "Error processing your request. Please try again.");
+			JOptionPane.showMessageDialog(jf, "A connection error has occured. Try again or contact support.");
 		}
 		return updated;
 	}
@@ -224,9 +232,9 @@ public class UpdateItem {
 	        	JOptionPane jf = new JOptionPane();
 				JOptionPane.showMessageDialog(jf, "Could not update item");
 	        }
-		} catch (Exception e){
+		} catch (SQLException e){
 			JOptionPane jf = new JOptionPane();
-			JOptionPane.showMessageDialog(jf, "Error processing your request. Please try again.");
+			JOptionPane.showMessageDialog(jf, "A connection error has occured. Try again or contact support.");
 		}
         
         return successfulUpdate;
