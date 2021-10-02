@@ -208,13 +208,13 @@ public class PantryGUI extends JFrame {
 			try {
 				if (CheckForAlerts.checkExpiredItems(con, sql)) {
 					expiredAlert.setFont(new Font("Dialog", Font.BOLD, 14));
-					expiredAlert.setText("Expired Items Alert");
+					expiredAlert.setText("Expiring Items Alert");
 					expiredAlert.setBackground(Color.RED);
-					expiredBtn.setText("Click to See Expired Items");
+					expiredBtn.setText("Click to See Expiring Items");
 				} else {
 					expiredAlert.setBackground(null);
-					expiredAlert.setText("No Expired Items!");
-					expiredBtn.setText("Click to See Expired Items");
+					expiredAlert.setText("No items expiring soon!");
+					expiredBtn.setText("Click to See Expiring Items");
 				}
 			} catch (SQLException e) {
 				JOptionPane jf = new JOptionPane();
@@ -240,7 +240,7 @@ public class PantryGUI extends JFrame {
 					lowInvBtn.setText("Click to See Low Inventory");
 				} else {
 					lowInvAlert.setBackground(null);
-					lowInvAlert.setText("Inventory all Good!");
+					lowInvAlert.setText("No low inventory items!");
 					lowInvBtn.setText("Click to See Low Inventory");
 				}
 			} catch (SQLException e) {
