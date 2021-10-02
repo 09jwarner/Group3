@@ -296,6 +296,7 @@ public class PantryGUI extends JFrame {
 			userLbl = new JLabel("Enter User Name: ");
 			panel.add(userLbl);
 			panel.add(userTxt);
+			userTxt.requestFocusInWindow();
 			pswdLbl = new JLabel("Enter Password: ");
 			panel.add(pswdLbl);
 			panel.add(pswdTxt);
@@ -308,15 +309,16 @@ public class PantryGUI extends JFrame {
 				char[] pswd = pswdTxt.getPassword();
 				String password = new String(pswd);
 				// con = openDatabase(user, pswd);
+				count = count + 1;
 				con = openDatabase(user, password, count);
 			} else {
 				System.exit(EXIT_ON_CLOSE);
 			}
 			if (con != null) {
-				count = 4;
-			} else {
+				count = 3;
+			}/* else {
 				count++;
-			}
+			}*/
 		}
 
 		return con;
@@ -324,7 +326,7 @@ public class PantryGUI extends JFrame {
 
 	/**
 	 * openDatabase: Takes the username and password and tries to open the Truck
-	 * database. The user is given 5 attempts to input correct username/password
+	 * database. The user is given 3 attempts to input correct username/password
 	 * combo before program closes.
 	 * @param user: user name
 	 * @param pswd: masked password
@@ -343,7 +345,7 @@ public class PantryGUI extends JFrame {
 			JOptionPane.showMessageDialog(jf, "Your user name or password is incorrect. Please try again.");
 			if (count == 2) {
 				JOptionPane.showMessageDialog(jf,
-						"You have had 4 unsuccessful logins. You have one more attempt to login.");
+						"You have had 2 unsuccessful logins. You have one more attempt to login, before the application closes.");
 			}
 			if (count == 3) {
 				System.exit(EXIT_ON_CLOSE);
