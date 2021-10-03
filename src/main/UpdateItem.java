@@ -12,7 +12,7 @@ package main;
  *	1.1		09/27/2021		MC			Added graceful error handling, added cancel buttons to pop ups and messages
  *										to handle them, Added comments and javadocs
  *	1.2		09/29/2021		MC			Fixed endless loop; added checks for fields entered and name
- *
+ *	1.3 	10/01/2021		MC			Added try-catch, updated SQL error message to be consistent with other classes
  *
  **/
 

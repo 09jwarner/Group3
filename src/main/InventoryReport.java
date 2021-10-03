@@ -10,7 +10,7 @@ package main;
  *	1.0 	09/21/2021		Heather		Started coding based on pseudocode 
  *	1.1		09/25/2021 		Heather		Updated table column names to match table
  *	1.2 	09/26/2021		Heather		Added Javadoc and comments
- *
+ *	1.3		10/03/2021		Heather		Updated column names for inventory report
  *
  **/
 

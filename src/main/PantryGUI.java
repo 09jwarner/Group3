@@ -14,7 +14,11 @@ package main;
  *										to make gui cleaner looking, changed to preparedstement instead of statement,
  *										added comments and javadocs
  *	1.4		09/29/2021		MC			Changed login to 3x, added text to alert buttons, changed title to Food Truck
- *
+ *	1.5		10/01/2021		MC			Added try-catch to update class and fixed sql error message to be consistent 
+ *										with other classes
+ *	1.6 	10/02/2021		John		Changed where username/password count is incremented
+ *	1.7		10/02/2021		Heather		Updated wording in GUI for alert panel and alert buttons
+ *	1.8 	10/03/2021		Heather		Fixed login count issue, login attempt message changes, updated column names
  *
  **/
 

@@ -11,7 +11,8 @@ package main;
  *  1.0		09/21/2021		MC			Coded based on pseudocode 
  *	1.1		09/27/2021		MC			Added graceful error handling, added cancel buttons to pop ups and messages
  *										to handle them, Added comments and javadocs
- *
+ *	1.2		09/29/2021		MC			Fixed windowing in update class and added alert button names
+ *	1.3		09/30/2021		John		Updated DeleteItem.java to check character length of Item Name
  *
  **/
 

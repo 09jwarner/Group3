@@ -10,6 +10,8 @@ package main;
  *	1.0		09/21/2021		Heather		Started code based on pseudocode
  *	1.1		09/25/2021 		Heather		Converted Statement to PreparedStatement, added cancel button, error handling and hiding of exceptions in user popups/user friendly messages
  *	1.2		09/26/2021		John		Added input validation for all user fields
+ *	1.3		09/28/2021		Heather		Added Javadocs, comments
+ *	1.4		09/29/2021		John		Added check for expiration date older than today's date			
  *
  **/
 
