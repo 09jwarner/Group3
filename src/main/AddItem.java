@@ -150,7 +150,6 @@ public class AddItem {
 					break;
 				// Catch for date and number format errors
 				} catch (IllegalArgumentException e) {
-					System.out.println(e);
 					JOptionPane jf = new JOptionPane();
 					JOptionPane.showMessageDialog(jf, "You have entered an invalid value for one of the fields!\n Quantities must be whole numbers and date must be in YYYY-MM-DD format!");
 					continue;

@@ -66,7 +66,6 @@ public class DeleteItem {
 				else
 					retrieveItemData(con, itemName);
 			} catch (Exception e) {
-				System.out.println(e);
 				JOptionPane jf = new JOptionPane();
 				JOptionPane.showMessageDialog(jf, "Error processing request. Please try again.");
 			}
