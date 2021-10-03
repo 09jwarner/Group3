@@ -287,7 +287,6 @@ public class PantryGUI extends JFrame {
 		while (count <= 3) {
 			JTextField userTxt = new JTextField(20);
 			JLabel userLbl = new JLabel();
-			// JTextField pswdTxt = new JTextField(20);
 			// Changed to JPasswordField to mask password text.
 			JPasswordField pswdTxt = new JPasswordField(20);
 			JLabel pswdLbl = new JLabel();
@@ -304,21 +303,19 @@ public class PantryGUI extends JFrame {
 					JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 			if (n == 0) {
 				String user = userTxt.getText();
-				// getText() has been deprecated, used character array
-				// used the variable String password to pass to openDatabase J. Warner
+
 				char[] pswd = pswdTxt.getPassword();
 				String password = new String(pswd);
-				// con = openDatabase(user, pswd);
-				count = count + 1;
 				con = openDatabase(user, password, count);
 			} else {
 				System.exit(EXIT_ON_CLOSE);
 			}
 			if (con != null) {
-				count = 3;
-			}/* else {
+				count = 4;
+			} else {
 				count++;
-			}*/
+			}
+			
 		}
 
 		return con;
@@ -342,13 +339,18 @@ public class PantryGUI extends JFrame {
 			con = DriverManager.getConnection(host, uname, password);
 		} catch (Exception e) {
 			JOptionPane jf = new JOptionPane();
-			JOptionPane.showMessageDialog(jf, "Your user name or password is incorrect. Please try again.");
-			if (count == 2) {
-				JOptionPane.showMessageDialog(jf,
-						"You have had 2 unsuccessful logins. You have one more attempt to login, before the application closes.");
-			}
-			if (count == 3) {
-				System.exit(EXIT_ON_CLOSE);
+			switch(count) {
+				case 0:
+					JOptionPane.showMessageDialog(jf, "Your user name or password is incorrect. Please try again.");
+					break;
+				case 1:
+					JOptionPane.showMessageDialog(jf,
+						"Incorrect username or password. You have had 2 unsuccessful logins. \nYou have one more attempt to login, before the application closes.");
+					break;
+				case 2: 
+					JOptionPane.showMessageDialog(jf,
+							"Incorrect username or password. \nYou have exceeded the maximum login attempts. The application will close.");				
+					System.exit(EXIT_ON_CLOSE);
 			}
 		}
 		return con;

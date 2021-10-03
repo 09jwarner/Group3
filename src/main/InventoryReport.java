@@ -29,7 +29,7 @@ import javax.swing.table.DefaultTableModel;
 
 public class InventoryReport {
 
-	static String[] columnNames = { "item_name", "exp_date", "qty_in_stock", "min_qty", "max_qty" };
+	static String[] columnNames = { "Item name", "Expiration Date", "Quantity in stock", "Minimum Quantity", "Maximum Quantity" };
 	
 	/**
 	 * displayInvReport: A report with relevant rows is displayed based on the user selection
