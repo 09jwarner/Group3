@@ -19,6 +19,7 @@ package main;
  *	1.6 	10/02/2021		John		Changed where username/password count is incremented
  *	1.7		10/02/2021		Heather		Updated wording in GUI for alert panel and alert buttons
  *	1.8 	10/03/2021		Heather		Fixed login count issue, login attempt message changes, updated column names
+ *	1.9		10/04/2021		Heather		Fixed exception catching so correct message is displayed if database is down
  *
  **/
 
@@ -203,6 +204,7 @@ public class PantryGUI extends JFrame {
 	/**
 	 * checkExpired: Checks to see if there is inventory that has expired or will
 	 * expire in the next 5 days.
+	 * 
 	 * @param con:        connection
 	 * @param alertPanel: alert main panel
 	 */
@@ -230,6 +232,7 @@ public class PantryGUI extends JFrame {
 	/**
 	 * checkLowInvAlert: Checks to see if there is inventory with qty_in_stock that
 	 * is less than or equal to min_qty needed to be kept on hand.
+	 * 
 	 * @param con:        connection
 	 * @param alertPanel: alert main panel
 	 */
@@ -257,6 +260,7 @@ public class PantryGUI extends JFrame {
 	/**
 	 * refreshAlerts: When inventory has been added, deleted or updated it refreshes
 	 * the expired or low inventory alert messages.
+	 * 
 	 * @param con:               connection
 	 * @param lowInvAlertPanel:  low inventory alert panel
 	 * @param expiredAlertPanel: expired alert panel
@@ -271,6 +275,7 @@ public class PantryGUI extends JFrame {
 	/**
 	 * exitBtnAction: Allows the user to have an exit button to quickly exit the
 	 * program and give an exit message.
+	 * 
 	 * @param con: connection
 	 */
 	public void exitBtnAction(ActionEvent e, Connection con) {
@@ -282,6 +287,7 @@ public class PantryGUI extends JFrame {
 
 	/**
 	 * getCredentials: It gets the username and password. It masks the password.
+	 * 
 	 * @return con: Connection
 	 */
 	private Connection getCredentials() {
@@ -319,7 +325,7 @@ public class PantryGUI extends JFrame {
 			} else {
 				count++;
 			}
-			
+
 		}
 
 		return con;
@@ -329,6 +335,7 @@ public class PantryGUI extends JFrame {
 	 * openDatabase: Takes the username and password and tries to open the Truck
 	 * database. The user is given 3 attempts to input correct username/password
 	 * combo before program closes.
+	 * 
 	 * @param user: user name
 	 * @param pswd: masked password
 	 * @return con: connection
@@ -341,27 +348,39 @@ public class PantryGUI extends JFrame {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			con = DriverManager.getConnection(host, uname, password);
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			JOptionPane jf = new JOptionPane();
-			switch(count) {
+			if (e.getMessage().contains("Communications link failure")) {
+				JOptionPane.showMessageDialog(jf,
+						"A connection error has occurred. Try again or contact the administrator");
+			} else {
+				switch (count) {
 				case 0:
 					JOptionPane.showMessageDialog(jf, "Your user name or password is incorrect. Please try again.");
 					break;
 				case 1:
 					JOptionPane.showMessageDialog(jf,
-						"Incorrect username or password. You have had 2 unsuccessful logins. \nYou have one more attempt to login, before the application closes.");
+							"Incorrect username or password. You have had 2 unsuccessful logins. \nYou have one more attempt to login, before the application closes.");
 					break;
-				case 2: 
+				case 2:
 					JOptionPane.showMessageDialog(jf,
-							"Incorrect username or password. \nYou have exceeded the maximum login attempts. The application will close.");				
+							"Incorrect username or password. \nYou have exceeded the maximum login attempts. The application will close.");
 					System.exit(EXIT_ON_CLOSE);
+				}
 			}
+		} catch (ClassNotFoundException cnfe) {
+
 		}
+
+//		} catch (CommunicationsException ce) {
+//			
+//		}
 		return con;
 	}
 
 	/**
 	 * closeDatabase: Closes the database
+	 * 
 	 * @param con: connection
 	 */
 	private void closeDatabase(Connection con) {
@@ -375,6 +394,7 @@ public class PantryGUI extends JFrame {
 
 	/**
 	 * main method
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {

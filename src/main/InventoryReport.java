@@ -11,16 +11,18 @@ package main;
  *	1.1		09/25/2021 		Heather		Updated table column names to match table
  *	1.2 	09/26/2021		Heather		Added Javadoc and comments
  *	1.3		10/03/2021		Heather		Updated column names for inventory report
- *
+ *	1.4		10/04/2021		Heather		Changed Exception to SQLException to catch connection error
  **/
 
 import java.awt.BorderLayout;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
@@ -29,12 +31,16 @@ import javax.swing.table.DefaultTableModel;
 
 public class InventoryReport {
 
-	static String[] columnNames = { "Item name", "Expiration Date", "Quantity in stock", "Minimum Quantity", "Maximum Quantity" };
-	
+	static String[] columnNames = { "Item name", "Expiration Date", "Quantity in stock", "Minimum Quantity",
+			"Maximum Quantity" };
+
 	/**
-	 * displayInvReport: A report with relevant rows is displayed based on the user selection
-	 * @param con: The active JDBC connection to the database
-	 * @param sql: The SQL statement to be used based on the type of report requested
+	 * displayInvReport: A report with relevant rows is displayed based on the user
+	 * selection
+	 * 
+	 * @param con:        The active JDBC connection to the database
+	 * @param sql:        The SQL statement to be used based on the type of report
+	 *                    requested
 	 * @param reportName: Report title based on type of report
 	 */
 	public static void displayInvReport(Connection con, String sql, String reportName) {
@@ -49,7 +55,7 @@ public class InventoryReport {
 				int qty = rs.getInt("qty_in_stock");
 				int minQty = rs.getInt("min_qty");
 				int maxQty = rs.getInt("max_qty");
-				
+
 				dtm.addRow(new Object[] { name, date, qty, minQty, maxQty });
 
 			}
@@ -71,8 +77,9 @@ public class InventoryReport {
 
 			frame.setSize(850, 400);
 			frame.setVisible(true);
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		} catch (SQLException e) {
+			JOptionPane jf = new JOptionPane();
+			JOptionPane.showMessageDialog(jf, "A connection error has occured. Try again or contact support.");
 		}
 	}
 }
